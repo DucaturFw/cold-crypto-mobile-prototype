@@ -716,12 +716,15 @@ export class PlaybackObject {
  */
 export interface BarCodeScannerProps extends ViewProps {
     type?: 'front' | 'back';
-    torchMode?: 'on' | 'off';
     barCodeTypes?: string[];
-    onBarCodeRead?: BarCodeReadCallback;
+    onBarCodeScanned?: BarCodeReadCallback;
 }
 
+type BarCodeTypes = typeof BarCodeScanner.Constants.BarCodeType
+type BarCodeType = BarCodeTypes[keyof BarCodeTypes]
+
 export class BarCodeScanner extends Component<BarCodeScannerProps> {
+    static scanFromURLAsync(url: string, barCodeTypes: BarCodeType[]): { type: BarCodeType, data: string }[]
     static Constants: {
         readonly TorchMode: {
             on: string;
