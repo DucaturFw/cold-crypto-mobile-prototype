@@ -805,6 +805,7 @@ export interface PictureOptions {
     base64?: boolean;
     exif?: boolean;
     onPictureSaved?: (data: PictureResponse) => void;
+    skipProcessing?: boolean; // Android only
 }
 
 export interface PictureResponse {
@@ -826,6 +827,7 @@ export class CameraObject {
     recordAsync(options: RecordingOptions): Promise<{ uri: string; }>;
     stopRecording(): void;
     getSupportedRatiosAsync(): Promise<string[]>; // Android only
+    getAvailablePictureSizesAsync(ratio: string): Promise<string[]>;
     pausePreview(): void;
     resumePreview(): void;
 }
