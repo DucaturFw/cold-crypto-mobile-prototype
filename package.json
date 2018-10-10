@@ -12,5 +12,11 @@
     "expo": "^30.0.1",
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz"
+  },
+  "devDependencies": {
+    "@types/react": "^16.4.16",
+    "@types/react-native": "^0.57.4",
+    "react-native-typescript-transformer": "^1.2.10",
+    "typescript": "^3.1.2"
   }
 }
