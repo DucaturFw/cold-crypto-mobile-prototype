@@ -90,25 +90,6 @@ export default class App extends React.Component
 	initCamera = async (camera: CameraObject) =>
 	{
 		this.camera = camera
-		
-		
-		let ratios = null
-		/* let retries = 0
-		while (!ratios && (retries < 5))
-		{
-			retries++;
-			try
-			{
-				
-			}
-			catch(e)
-			{
-				console.log(`App.initCamera(): encountered error on supported ratios, retrying ${retries}/5...`)
-			}
-		} */
-		if (!ratios)
-			return
-		
 	}
 	render() {
 		if (!this.state.cameraPermissionStatus)
