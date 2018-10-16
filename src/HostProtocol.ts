@@ -7,6 +7,10 @@ export interface IHostCommand<TArr extends any[], TObj extends {}>
 export function parseHostCommand(msg: string): IHostCommand<any[], any>
 {
 	let [method, id, data] = msg.split('|', 3)
+	let prefixLength = method.length + id.length + data.length + 2
+	if (msg.length > prefixLength)
+		data += msg.substr(prefixLength)
+	
 	let args = JSON.parse(data || "[]")
 	return {
 		method,

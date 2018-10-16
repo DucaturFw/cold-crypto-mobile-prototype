@@ -1,4 +1,4 @@
-import { arrayToObj, objToArray, parseHostCommand, allToObj, allToArray, parseHostCommandToArray } from "./HostProtocol";
+import { arrayToObj, objToArray, parseHostCommand, allToObj, allToArray, parseHostCommandToArray, parseHostCommandToObject } from "./HostProtocol";
 
 describe('host protocol tests', () =>
 {
@@ -33,9 +33,9 @@ describe('host protocol tests', () =>
 	})
 	it('should parse object commands', () =>
 	{
-		expect(parseHostCommandToArray('test|5|[1,2,3]', ["foo", "bar", "baz"]))
+		expect(parseHostCommandToObject('test|5|[1,2,3]', ["foo", "bar", "baz"]))
 			.toEqual({ method: "test", id: "5", args: {foo:1, bar:2, baz:3} })
-		expect(parseHostCommandToArray('test|5|{"foo":1,"bar":2,"baz":3}', ["foo", "bar", "baz"]))
+		expect(parseHostCommandToObject('test|5|{"foo":1,"bar":2,"baz":3}', ["foo", "bar", "baz"]))
 			.toEqual({ method: "test", id: "5", args: {foo:1, bar:2, baz:3} })
 	})
 	it('should convert arrays to objects', () =>
