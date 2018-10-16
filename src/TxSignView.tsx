@@ -1,6 +1,8 @@
 import React from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native'
-import { IWallet, IEthTransferTxRequest } from './interfaces'
+import { IWallet, IEthTransferTxRequest, IWalletStorage } from './interfaces'
+import Web3 = require('web3')
+import { getPk } from './WalletStorage';
 
 export interface TxSignViewProps
 {
@@ -8,15 +10,26 @@ export interface TxSignViewProps
 	onSign: (signedTx: string) => void
 	tx: IEthTransferTxRequest
 	wallet: IWallet
+	wallets: IWalletStorage
 }
 
-export default class TxSignView extends React.Component<TxSignViewProps>
+export interface TxSignViewState
 {
-	state = {
-		checkedValue: false,
-		checkedTo: false,
+	checkedValue?: boolean
+	checkedTo?: boolean
+	web3: Web3
+}
+
+export default class TxSignView extends React.Component<TxSignViewProps, TxSignViewState>
+{
+	constructor(props: TxSignViewProps)
+	{
+		super(props)
+		this.state = {
+			web3: new Web3()
+		}
 	}
-	onSignButton = () =>
+	onSignButton = async () =>
 	{
 		let tx = {
 			...this.props.tx,
@@ -27,9 +40,14 @@ export default class TxSignView extends React.Component<TxSignViewProps>
 		}
 		// tx signing magic goes here
 		// ...
-		let signedTx = '0xededededededed123456812345678'
+		let pk = getPk(this.props.wallets, this.props.wallet)
+		if (!pk)
+			return console.error(`private key not found for wallet <${this.props.wallet.blockchain}/${this.props.wallet.chainId}/${this.props.wallet.address}>!`)
+		
+		let acc = this.state.web3.eth.accounts.privateKeyToAccount(pk)
+		let signedTx = await acc.signTransaction(tx)
 
-		this.props.onSign(signedTx)
+		this.props.onSign(signedTx.rawTransaction)
 	}
 	render()
 	{

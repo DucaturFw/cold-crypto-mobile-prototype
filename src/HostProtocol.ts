@@ -1,10 +1,17 @@
-export interface IHostCommand<TArr extends any[], TObj extends {}>
+export interface IHostCommand<TArr extends (TObj[keyof TObj][] | unknown[]), TObj>
 {
 	method: string
 	id: string | number
 	args: TArr | TObj
 }
-export function parseHostCommand(msg: string): IHostCommand<any[], any> | undefined
+
+export type IHCSimple<T1 = unknown, T2 = unknown, T3 = unknown, T4 = unknown, T5 = unknown, T6 = unknown, T7 = unknown>
+	= IHostCommand<
+		[T1[keyof T1], T2[keyof T2], T3[keyof T3], T4[keyof T4], T5[keyof T5], T6[keyof T6], T7[keyof T7]],
+		T1 & T2 & T3 & T4 & T5 & T6 & T7
+	>
+
+export function parseHostCommand(msg: string): IHostCommand<unknown[], unknown> | undefined
 {
 	if (!msg)
 		return undefined // empty message
@@ -25,20 +32,6 @@ export function parseHostCommand(msg: string): IHostCommand<any[], any> | undefi
 		args
 	}
 }
-export function parseHostCommandToArray<TArr extends TObj[keyof TObj][], TObj>(msg: string, mapping: (keyof TObj)[]): IHostCommand<TArr, never> | undefined
-{
-	let m = parseHostCommand(msg)
-	if (!m)
-		return undefined
-	return { ...m, args: allToArray(m.args, mapping) }
-}
-export function parseHostCommandToObject<TObj>(msg: string, mapping: (keyof TObj)[]): IHostCommand<never, TObj> | undefined
-{
-	let m = parseHostCommand(msg)
-	if (!m)
-		return undefined
-	return { ...m, args: allToObj(m.args, mapping) }
-}
 export function arrayToObj<TArr extends any[], TObj>(args: TArr, mapping: (keyof TObj)[]): TObj
 {
 	return args.reduce((acc, cur, idx) => (acc[mapping[idx]] = cur, acc), {})
@@ -47,11 +40,11 @@ export function objToArray<TArr extends TObj[keyof TObj][], TObj extends {}>(arg
 {
 	return mapping.map(name => args[name]) as TArr
 }
-export function allToObj<TObj>(args: TObj | TObj[keyof TObj][], mapping: (keyof TObj)[]): TObj
+export function allToObj<TObj>(msg: IHostCommand<TObj[keyof TObj][], TObj>, mapping: (keyof TObj)[]): TObj
 {
-	return Array.isArray(args) ? arrayToObj(args, mapping) : args
+	return Array.isArray(msg.args) ? arrayToObj(msg.args, mapping) : msg.args
 }
-export function allToArray<TArr extends TObj[keyof TObj][], TObj>(args: TObj | TArr, mapping: (keyof TObj)[]): TArr
+export function allToArray<TArr extends TObj[keyof TObj][], TObj>(msg: IHostCommand<TArr, TObj>, mapping: (keyof TObj)[]): TArr
 {
-	return Array.isArray(args) ? args : objToArray(args, mapping)
+	return Array.isArray(msg.args) ? msg.args : objToArray(msg.args, mapping)
 }

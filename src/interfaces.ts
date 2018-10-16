@@ -16,3 +16,5 @@ export interface IEthTransferTxRequest
 	// from: string // can be determined from wallet
 	// chainId: number // can be determined from wallet
 }
+export type IWalletWithPk = { wallet: IWallet, pk: string }
+export type IWalletStorage = { [key in IBlockchainIdent]?: IWalletWithPk[] }

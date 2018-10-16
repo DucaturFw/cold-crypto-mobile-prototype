@@ -3,8 +3,10 @@ import { StyleSheet, Text, View, Button } from 'react-native'
 import CameraView from './CameraView'
 import TxSignView from './TxSignView'
 import { parseHostCommand, allToObj, allToArray } from './HostProtocol'
-import { IWallet, IEthTransferTxRequest, IBlockchainIdent } from './interfaces'
-import QRCode from 'react-native-qrcode';
+import { IWallet, IEthTransferTxRequest, IWalletStorage } from './interfaces'
+import QRCode from 'react-native-qrcode'
+import { ethWallet } from './WalletStorage'
+import { isSignTransferTxCommand, isGetWalletListCommand } from './HostCommands'
 
 enum AppMode
 {
@@ -13,23 +15,26 @@ enum AppMode
 	SIGNING_TRANSFER_TX,
 	SHOWING_QR,
 }
-interface ITxToSign
-{
-	wallet: IWallet
-	tx: IEthTransferTxRequest
-}
 interface AppState
 {
 	mode: AppMode
-	txToSign?: ITxToSign
+	txToSign?: { tx: IEthTransferTxRequest, wallet: IWallet }
 	responseQr?: string
+	walletStorage: IWalletStorage
 }
 export default class App extends React.Component<{}, AppState>
 {
 	constructor(props: {})
 	{
 		super(props)
-		this.state = { mode: AppMode.MAIN_PAGE }
+		this.state = {
+			mode: AppMode.MAIN_PAGE,
+			walletStorage: { eth: [
+				ethWallet('767406a8a64499b3b2fc139c8cbb632e72f6d9983037f5140263400aa9c7379e', 4),
+				ethWallet('b2481a5b798b858dee7f2b7f7efdb8e84a8274a4a8d4bc495d4f40a3a714aa19', 4),
+				ethWallet('c7729b45fbed37458da5f3304b2846cb01f260c5b24a8bd8de471eb34dd18ecb', 4),
+			] }
+		}
 	}
 
 	_handleBarCodeRead = (qr: string) =>
@@ -39,19 +44,26 @@ export default class App extends React.Component<{}, AppState>
 		if (!msg)
 			return console.log(`qr code is in incorrect format! ${qr}`)
 		
-		if (msg.method == "signTransferTx")
+		if (isSignTransferTxCommand(msg))
 		{
-			let args = allToObj<ITxToSign>(msg.args, ["tx", "wallet"])
-			this.setState({ txToSign: args })
+			let txToSign = allToObj(msg, ["tx", "wallet"])
+			this.setState({ txToSign })
 			this.changeMode(AppMode.SIGNING_TRANSFER_TX)
 		}
-		if (msg.method == "getWalletList")
+		if (isGetWalletListCommand(msg))
 		{
-			let [supportedBlockchains] = allToArray<[IBlockchainIdent[]], {supportedBlockchains: IBlockchainIdent[]}>(msg.args, ["supportedBlockchains"])
-			let wallets = [] as IWallet[]
+			let [supportedBlockchains] = allToArray(msg, ["supportedBlockchains"])
+			
+			if (!supportedBlockchains)
+				supportedBlockchains = ['eth', 'eos', 'neo', 'btc']
+			
 			console.log(`blockchains: ${supportedBlockchains}`)
-			if (supportedBlockchains && supportedBlockchains.includes("eth"))
-				wallets.push({ blockchain: "eth", chainId: 1, address: "0x0000000000000000000000000000000000000000" })
+			
+			let wallets = supportedBlockchains
+				.map(bc => this.state.walletStorage[bc]) // get wallets for blockchains
+				.filter(x => x && x.length) // filter out empty wallet lists
+				.map(arr => arr!.map(x => x.wallet)) // remove private keys
+				.reduce((acc, cur) => acc.concat(cur), []) // flatten into array
 			
 			this.setState({ responseQr: `|${msg.id || ""}|${JSON.stringify(wallets)}` })
 			this.changeMode(AppMode.SHOWING_QR)
@@ -108,6 +120,7 @@ export default class App extends React.Component<{}, AppState>
 					<TxSignView
 						tx={this.state.txToSign!.tx}
 						wallet={this.state.txToSign!.wallet}
+						wallets={this.state.walletStorage}
 						onSign={this.onTxSigned}
 						onCancel={this.onTxSignCancelled}
 					></TxSignView>
