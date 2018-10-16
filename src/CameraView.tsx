@@ -8,8 +8,14 @@ export interface CameraViewProps
 	onPacketComplete?: (packets: string[]) => void
 	onBackButton?: () => void
 }
+export interface CameraViewState
+{
+	cameraPermissionStatus?: string
+	cameraRatio?: string
+	cameraPictureSize?: string
+}
 
-export default class CameraView extends React.Component<CameraViewProps>
+export default class CameraView extends React.Component<CameraViewProps, CameraViewState>
 {
 	state = {
 		cameraPermissionStatus: '',
@@ -23,7 +29,7 @@ export default class CameraView extends React.Component<CameraViewProps>
 		if (this.props.onBarCodeScanned)
 			this.props.onBarCodeScanned(data)
 	}
-	componentWillMount = async () =>
+	componentDidMount = async () =>
 	{
 		let perm = await Permissions.getAsync(Permissions.CAMERA)
 		let cameraPermissionStatus = perm.status
@@ -70,7 +76,7 @@ export default class CameraView extends React.Component<CameraViewProps>
 		// load ratios
 		let ratios = await this.camera.getSupportedRatiosAsync()
 		
-		let cameraRatio = null
+		let cameraRatio = undefined
 		if (ratios.includes('16:9'))
 			cameraRatio = '16:9'
 		else if (ratios.length > 0)
@@ -85,7 +91,7 @@ export default class CameraView extends React.Component<CameraViewProps>
 		
 		let sizes = await this.camera.getAvailablePictureSizesAsync(cameraRatio)
 		let minIndex = 0
-		let size = null
+		let size = undefined
 		if (sizes && sizes.length)
 		{
 			console.log(`App.onCameraReady: got sizes ${sizes}`)
