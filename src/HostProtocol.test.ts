@@ -1,4 +1,5 @@
-import { arrayToObj, objToArray, parseHostCommand, allToObj, allToArray, parseHostCommandToArray, parseHostCommandToObject } from "./HostProtocol";
+import { arrayToObj, objToArray, parseHostCommand, allToObj, allToArray, parseHostCommandToArray, parseHostCommandToObject } from "./HostProtocol"
+import { IBlockchainIdent } from "./interfaces"
 
 describe('host protocol tests', () =>
 {
@@ -61,5 +62,17 @@ describe('host protocol tests', () =>
 		expect(arr).toEqual(["test", 1, 2, 3])
 		arr = allToArray(arr, ['foo', 'bar', 'baz', 'test'])
 		expect(arr).toEqual(["test", 1, 2, 3])
+	})
+	it('regression', () =>
+	{
+		let msg = parseHostCommand('getWalletList||[[]]')!
+		expect(msg).not.toBeNull()
+		let args = allToArray<[IBlockchainIdent[]], {supportedBlockchains: IBlockchainIdent[]}>(msg.args, ["supportedBlockchains"])
+		expect(args).toEqual([[]])
+
+		msg = parseHostCommand('getWalletList||[]')!
+		expect(msg).not.toBeNull()
+		args = allToArray<[IBlockchainIdent[]], {supportedBlockchains: IBlockchainIdent[]}>(msg.args, ["supportedBlockchains"])
+		expect(args).toEqual([])
 	})
 })
