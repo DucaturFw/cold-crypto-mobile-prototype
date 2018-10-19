@@ -22,6 +22,7 @@
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-qrcode": "^0.2.7",
+    "readable-stream": "^3.0.6",
     "ts-jest": "^23.10.4",
     "url": "^0.11.0",
     "util": "^0.11.0",
