@@ -1,5 +1,6 @@
 import { IWalletStorage, IWallet, IWalletWithPk } from "./interfaces"
-import Web3 = require('web3')
+import Wallet from "ethereumjs-wallet"
+import { Buffer } from "buffer"
 
 export function getPk(storage: IWalletStorage, wallet: IWallet): string | null
 {
@@ -15,12 +16,11 @@ export function getPk(storage: IWalletStorage, wallet: IWallet): string | null
 
 export function ethWallet(pk: string, chainId: number): IWalletWithPk
 {
-	let web3 = new Web3()
-	let acc = web3.eth.accounts.privateKeyToAccount(pk)
+	let address = Wallet.fromPrivateKey(Buffer.from(pk, 'hex')).getChecksumAddressString()
 	return {
 		pk,
 		wallet: {
-			address: acc.address,
+			address,
 			blockchain: 'eth',
 			chainId
 		}

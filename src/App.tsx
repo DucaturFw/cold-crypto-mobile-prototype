@@ -1,3 +1,5 @@
+import "../globals"
+
 import React, { ReactInstance } from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native'
 import CameraView from './CameraView'
