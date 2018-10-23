@@ -1,11 +1,14 @@
 {
   "expo": {
-    "name": "qrs-signer",
-    "description": "This project is really great.",
-    "slug": "qrs-signer",
+    "name": "Cold Crypto Mobile Prototype",
+    "description": "Cold Crypto mobile prototype",
+    "slug": "cold-crypto-mobile-prototype",
     "privacy": "public",
     "sdkVersion": "30.0.0",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,8 +28,12 @@
     },
     "packagerOpts": {
       "config": "metro.config.js",
-      "sourceExts": ["ts", "tsx"],
+      "sourceExts": [
+        "ts",
+        "tsx"
+      ],
       "transformer": "node_modules/react-native-typescript-transformer/index.js"
-    }
+    },
+    "githubUrl": "https://github.com/DucaturFw/cold-crypto-mobile-prototype"
   }
 }
