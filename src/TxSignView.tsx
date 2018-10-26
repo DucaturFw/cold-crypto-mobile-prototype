@@ -4,6 +4,8 @@ import { IWallet, IEthTransferTxRequest, IWalletStorage } from './interfaces'
 import { getPk } from './WalletStorage'
 import { Buffer } from "buffer"
 import EthTx from "ethereumjs-tx"
+import unsignTx from "@warren-bank/ethereumjs-tx-unsign"
+import BN from "bn.js"
 
 export interface TxSignViewProps
 {
@@ -21,6 +23,14 @@ export interface TxSignViewState
 	checkedTo?: boolean
 }
 
+export function toHex(num: string): string
+{
+	console.log(`pre-hex: ${num}`)
+	let bn = '0x' + new BN(num).toString('hex')
+	console.log(`post-hex: ${bn}`)
+	return bn
+}
+
 export default class TxSignView extends React.Component<TxSignViewProps, TxSignViewState>
 {
 	constructor(props: TxSignViewProps)
@@ -31,6 +41,9 @@ export default class TxSignView extends React.Component<TxSignViewProps, TxSignV
 	{
 		let tx = {
 			...this.props.tx,
+			value: toHex(this.props.tx.value),
+			gasPrice: toHex(this.props.tx.gasPrice),
+			nonce: toHex(this.props.tx.nonce.toString()),
 			from: this.props.wallet.address,
 			gasLimit: "0x5208",
 			data: '0x',
@@ -43,6 +56,7 @@ export default class TxSignView extends React.Component<TxSignViewProps, TxSignV
 			return console.error(`private key not found for wallet <${this.props.wallet.blockchain}/${this.props.wallet.chainId}/${this.props.wallet.address}>!\n${JSON.stringify(this.props.wallets)}`)
 		
 		let etx = new EthTx(tx)
+		console.log(tx)
 		let buf = new Buffer(pk, 'hex')
 		console.log(buf)
 		console.log(`buffer length: ${buf.length}`)
@@ -50,6 +64,7 @@ export default class TxSignView extends React.Component<TxSignViewProps, TxSignV
 		let signedTx = '0x' + etx.serialize().toString('hex')
 		// let signedTx = '--'
 		console.log(signedTx)
+		console.log(unsignTx(signedTx))
 
 		this.props.onSign(this.props.msgid, signedTx)
 	}
@@ -59,9 +74,9 @@ export default class TxSignView extends React.Component<TxSignViewProps, TxSignV
 			<View style={ styles.container }>
 				<Text>{`raw: ${this.props.tx}`}</Text>
 				<Text>To: { this.props.tx.to }</Text>
-				<Text>Gas price: { this.props.tx.gasPrice }</Text>
+				<Text>Gas price: { this.props.tx.gasPrice } ({ parseInt(this.props.tx.gasPrice) * 21000 / 1e18 } ETH)</Text>
 				<Text>Nonce: { this.props.tx.nonce }</Text>
-				<Text>Value: { this.props.tx.value }</Text>
+				<Text>Value: { parseInt(this.props.tx.value) / 1e18 } ETH</Text>
 				<Button title="Sign" onPress={this.onSignButton}></Button>
 				<Button title="Cancel" onPress={this.props.onCancel}></Button>
 			</View>
