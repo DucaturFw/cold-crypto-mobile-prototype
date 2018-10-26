@@ -2,7 +2,7 @@ export interface IHostCommand<TArr extends (TObj[keyof TObj][] | unknown[]), TOb
 {
 	method: string
 	id: string | number
-	args: TArr | TObj
+	params: TArr | TObj
 }
 
 export type IHCSimple<T1 = unknown, T2 = unknown, T3 = unknown, T4 = unknown, T5 = unknown, T6 = unknown, T7 = unknown>
@@ -25,11 +25,11 @@ export function parseHostCommand(msg: string): IHostCommand<unknown[], unknown> 
 	if (msg.length > prefixLength)
 		data += msg.substr(prefixLength)
 	
-	let args = JSON.parse(data || "[]")
+	let params = JSON.parse(data || "[]")
 	return {
 		method,
 		id,
-		args
+		params
 	}
 }
 export function arrayToObj<TArr extends any[], TObj>(args: TArr, mapping: (keyof TObj)[]): TObj
@@ -42,9 +42,9 @@ export function objToArray<TArr extends TObj[keyof TObj][], TObj extends {}>(arg
 }
 export function allToObj<TObj>(msg: IHostCommand<TObj[keyof TObj][], TObj>, mapping: (keyof TObj)[]): TObj
 {
-	return Array.isArray(msg.args) ? arrayToObj(msg.args, mapping) : msg.args
+	return Array.isArray(msg.params) ? arrayToObj(msg.params, mapping) : msg.params
 }
 export function allToArray<TArr extends TObj[keyof TObj][], TObj>(msg: IHostCommand<TArr, TObj>, mapping: (keyof TObj)[]): TArr
 {
-	return Array.isArray(msg.args) ? msg.args : objToArray(msg.args, mapping)
+	return Array.isArray(msg.params) ? msg.params : objToArray(msg.params, mapping)
 }
