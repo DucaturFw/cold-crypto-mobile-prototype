@@ -106,15 +106,12 @@ export default class CameraView extends React.Component<CameraViewProps, CameraV
 
 		this.setState({ cameraPictureSize: size })
 	}
-	initCamera = async (camera: CameraObject) =>
-	{
-		this.camera = camera
-	}
 	render()
 	{
 		console.log(`camera permission: ${this.state.cameraPermissionStatus}`)
 		if (!this.state.cameraPermissionStatus)
 		{
+			console.log(`requesting camera permission`)
 			return (
 				<View style={styles.container}>
 					<Text>Camera permission is unknown</Text>
@@ -124,7 +121,11 @@ export default class CameraView extends React.Component<CameraViewProps, CameraV
 		}
 		else if (this.state.cameraPermissionStatus !== 'granted')
 		{
-			return <View style={styles.container}><Text>Camera status: { this.state.cameraPermissionStatus }</Text></View>
+			console.log(`camera permission denied`)
+			return (<View style={styles.container}>
+				<Text>Camera status: { this.state.cameraPermissionStatus }</Text>
+				<Button title="Ask camera permission" onPress={this.askCameraPermission}></Button>
+			</View>)
 		}
 		let cameraAttrs = { ratio: this.state.cameraRatio, pictureSize: this.state.cameraPictureSize }
 		if (!this.state.cameraRatio)
