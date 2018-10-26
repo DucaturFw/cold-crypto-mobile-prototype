@@ -2,7 +2,7 @@ type Id = string | number | null
 export function notify(method: string, params: {} | unknown[], reduced: boolean = false)
 {
 	if (reduced)
-		return `${method}||${params}`
+		return `${method}||${JSON.stringify(params)}`
 	
 	return jrpcs({
 		method,
@@ -19,7 +19,7 @@ export function error(id: Id | undefined, error: any)
 export function result<T>(id: Id | undefined, result: T, reduced: boolean = false)
 {
 	if (reduced)
-		return `|${id}|${result}`
+		return `|${id}|${JSON.stringify(result)}`
 	
 	return jrpcs({
 		id,
