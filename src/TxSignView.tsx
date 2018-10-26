@@ -8,10 +8,11 @@ import EthTx from "ethereumjs-tx"
 export interface TxSignViewProps
 {
 	onCancel: () => void
-	onSign: (signedTx: string) => void
+	onSign: (msgid: string | number | null, signedTx: string) => void
 	tx: IEthTransferTxRequest
 	wallet: IWallet
 	wallets: IWalletStorage
+	msgid: string | number | null
 }
 
 export interface TxSignViewState
@@ -50,7 +51,7 @@ export default class TxSignView extends React.Component<TxSignViewProps, TxSignV
 		// let signedTx = '--'
 		console.log(signedTx)
 
-		this.props.onSign(signedTx)
+		this.props.onSign(this.props.msgid, signedTx)
 	}
 	render()
 	{

@@ -9,6 +9,7 @@ import { IWallet, IEthTransferTxRequest, IWalletStorage } from './interfaces'
 import QRCode from 'react-native-qrcode'
 import { ethWallet } from './WalletStorage'
 import { isSignTransferTxCommand, isGetWalletListCommand } from './HostCommands'
+import * as jrpc from "./jsonrpc"
 
 enum AppMode
 {
@@ -20,7 +21,7 @@ enum AppMode
 interface AppState
 {
 	mode: AppMode
-	txToSign?: { tx: IEthTransferTxRequest, wallet: IWallet }
+	txToSign?: { tx: IEthTransferTxRequest, wallet: IWallet, msgid: string | number | null }
 	responseQr?: string
 	walletStorage: IWalletStorage
 }
@@ -48,7 +49,7 @@ export default class App extends React.Component<{}, AppState>
 		
 		if (isSignTransferTxCommand(msg))
 		{
-			let txToSign = allToObj(msg, ["tx", "wallet"])
+			let txToSign = { ...allToObj(msg, ["tx", "wallet"]), msgid: msg.id }
 			this.setState({ txToSign })
 			this.changeMode(AppMode.SIGNING_TRANSFER_TX)
 		}
@@ -67,7 +68,7 @@ export default class App extends React.Component<{}, AppState>
 				.map(arr => arr!.map(x => x.wallet)) // remove private keys
 				.reduce((acc, cur) => acc.concat(cur), []) // flatten into array
 			
-			this.setState({ responseQr: `|${msg.id || ""}|${JSON.stringify(wallets)}` })
+			this.setState({ responseQr: jrpc.result(msg.id, wallets, true) })
 			this.changeMode(AppMode.SHOWING_QR)
 		}
 	}
@@ -83,10 +84,10 @@ export default class App extends React.Component<{}, AppState>
 	{
 		this.changeMode(AppMode.MAIN_PAGE)
 	}
-	onTxSigned = (signedTx: string) =>
+	onTxSigned = (msgid: string | number | null, signedTx: string) =>
 	{
 		console.log(`transaction signed! ${signedTx}`)
-		this.setState({ responseQr: signedTx })
+		this.setState({ responseQr: jrpc.result(msgid, signedTx, true) })
 		this.changeMode(AppMode.SHOWING_QR)
 	}
 	onTxSignCancelled = () =>
@@ -120,6 +121,7 @@ export default class App extends React.Component<{}, AppState>
 			case AppMode.SIGNING_TRANSFER_TX:
 				return (
 					<TxSignView
+						msgid={this.state.txToSign!.msgid}
 						tx={this.state.txToSign!.tx}
 						wallet={this.state.txToSign!.wallet}
 						wallets={this.state.walletStorage}
