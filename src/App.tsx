@@ -1,7 +1,7 @@
 import "../globals"
 
 import React, { ReactInstance } from 'react'
-import { StyleSheet, Text, View, Button } from 'react-native'
+import { StyleSheet, Text, View, Button, Dimensions } from 'react-native'
 import CameraView from './CameraView'
 import TxSignView from './TxSignView'
 import { parseHostCommand, allToObj, allToArray } from './HostProtocol'
@@ -130,11 +130,13 @@ export default class App extends React.Component<{}, AppState>
 					></TxSignView>
 				)
 			case AppMode.SHOWING_QR:
+				let {width, height} = Dimensions.get("window")
+				let size = Math.min(width * 0.95, height * 0.95)
 				return (
 					<View style={ styles.container }>
 						<Text>Scan this QR on your computer</Text>
 						<Text>{ this.state.responseQr }</Text>
-						<QRCode value={this.state.responseQr} size={400}></QRCode>
+						<QRCode value={this.state.responseQr} size={size}></QRCode>
 						<Button title="Back" onPress={this.onReturnFromQr}></Button>
 					</View>
 				)
