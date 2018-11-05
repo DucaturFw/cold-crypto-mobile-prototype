@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native'
 import { IWallet, IEthTransferTxRequest, IWalletStorage } from './interfaces'
 import { getPk } from './WalletStorage'
-import { signTx } from "./blockchains/eth"
+import { signTx } from "bcts/src/blockchains/eth"
 import unsignTx from "@warren-bank/ethereumjs-tx-unsign"
 import BN from "bn.js"
 

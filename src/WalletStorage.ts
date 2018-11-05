@@ -1,5 +1,5 @@
 import { IWalletStorage, IWallet, IWalletWithPk } from "./interfaces"
-import { eth } from "./blockchains"
+import { eth } from "bcts/src/blockchains"
 
 export function getPk(storage: IWalletStorage, wallet: IWallet): string | null
 {
