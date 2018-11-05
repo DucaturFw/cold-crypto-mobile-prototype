@@ -16,7 +16,9 @@ export function parseHostCommand(msg: string): IHostCommand<unknown[], unknown> 
 	if (!msg)
 		return undefined // empty message
 	
-	if (!/^.*\|.*\|.*$/.test(msg))
+	let regex = /^.*|.*|.*$/
+
+	if (!regex.test(msg))
 		return undefined // not enough data to parse
 
 	let [method, id, data] = msg.split('|', 3).map(x => x || "")
