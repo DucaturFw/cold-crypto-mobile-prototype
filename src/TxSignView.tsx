@@ -2,8 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View, Button } from 'react-native'
 import { IWallet, IEthTransferTxRequest, IWalletStorage } from './interfaces'
 import { getPk } from './WalletStorage'
-import { Buffer } from "buffer"
-import EthTx from "ethereumjs-tx"
+import { signTx } from "./blockchains/eth"
 import unsignTx from "@warren-bank/ethereumjs-tx-unsign"
 import BN from "bn.js"
 
@@ -55,13 +54,7 @@ export default class TxSignView extends React.Component<TxSignViewProps, TxSignV
 		if (!pk)
 			return console.error(`private key not found for wallet <${this.props.wallet.blockchain}/${this.props.wallet.chainId}/${this.props.wallet.address}>!\n${JSON.stringify(this.props.wallets)}`)
 		
-		let etx = new EthTx(tx)
-		console.log(tx)
-		let buf = new Buffer(pk, 'hex')
-		console.log(buf)
-		console.log(`buffer length: ${buf.length}`)
-		etx.sign(buf)
-		let signedTx = '0x' + etx.serialize().toString('hex')
+		let signedTx = signTx(tx, pk)
 		// let signedTx = '--'
 		console.log(signedTx)
 		console.log(unsignTx(signedTx))

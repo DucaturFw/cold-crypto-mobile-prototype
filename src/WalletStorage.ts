@@ -1,6 +1,5 @@
 import { IWalletStorage, IWallet, IWalletWithPk } from "./interfaces"
-import Wallet from "ethereumjs-wallet"
-import { Buffer } from "buffer"
+import { eth } from "./blockchains"
 
 export function getPk(storage: IWalletStorage, wallet: IWallet): string | null
 {
@@ -16,7 +15,7 @@ export function getPk(storage: IWalletStorage, wallet: IWallet): string | null
 
 export function ethWallet(pk: string, chainId: number): IWalletWithPk
 {
-	let address = Wallet.fromPrivateKey(Buffer.from(pk, 'hex')).getChecksumAddressString()
+	let address = eth.privateKeyToAccount(pk).address
 	return {
 		pk,
 		wallet: {
